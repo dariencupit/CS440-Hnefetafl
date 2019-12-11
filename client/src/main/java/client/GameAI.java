@@ -7,6 +7,12 @@ public class GameAI {
 	//		represent to in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
+	ClientGame clientGame;
+	
+	GameAI (ClientGame game) {
+		this.clientGame = game;
+		
+	}
 	
 	public int[] Minimax_Decision(char[][] state) { // Implements Alpha-Beta Pruning
 		
