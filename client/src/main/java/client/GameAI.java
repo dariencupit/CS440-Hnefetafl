@@ -8,17 +8,17 @@ public class GameAI {
 	// State
 	//		- State is represented as a double char array of characters
 	
-	public int[] Minimax_Decision(char[][] state) { // Implements Alpha-Beta
+	public int[] Minimax_Decision(char[][] state) { // Implements Alpha-Beta Pruning
 		
 		return new int[0];
 	}
 	
-	public double Max_Value(char[][] state) {
+	public double Max_Value(char[][] state, int a, int b) {
 		
 		return 0.0;
 	}
 	
-	public double Min_Value(char[][] state) {
+	public double Min_Value(char[][] state, int a, int b) {
 		
 		return 0.0;
 	}
