@@ -23,17 +23,29 @@ public class GameAI {
 		return new int[0];
 	}
 	
-	public double Max_Value(char[][] state, double a, double b) {
+	public double Max_Value(char[][] state, int player, double a, double b) {
 		
 		return 0.0;
 	}
 	
-	public double Min_Value(char[][] state, double a, double b) {
+	public double Min_Value(char[][] state, int player, double a, double b) {
 		// TODO Find where to increment this.depth and where to put it back to 0
 		if (this.depth == this.limit) return Heuristic(state);
 		double value = Double.MAX_VALUE;
-		
-		return 0.0;
+		int[][] actions = Actions(state, player);
+		for (int[] action : actions) {
+			value = Double.max(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
+			if (value <= a) return value;
+			b = Double.min(b, value); // Change this to be a reference
+		}
+		return value;
+	}
+	
+	public int Switch_Player(int current_player) {
+		int new_player;
+		if (current_player == 0) new_player = 1;
+		else new_player = 0;
+		return new_player;
 	}
 	
 	public double Heuristic(char[][] state) {
@@ -46,7 +58,7 @@ public class GameAI {
 		return new char[0][0];
 	}
 	
-	public int[][] Actions(char[][] state, char player) {
+	public int[][] Actions(char[][] state, int player) {
 		
 		return new int[0][0];
 	}
