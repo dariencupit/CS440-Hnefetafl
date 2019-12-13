@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.String;
+import java.util.Arrays;
+
 import javax.swing.*;
 
 
@@ -15,8 +17,9 @@ public class ClientGame {
 	private char[][] gameBoard;
 	private int turn;
 	private String[] players;
-	private int playerChoice = -1;
+	public int playerChoice = -1;
 	public ClientGUI gameGUI;
+	public GameAI gameAI;
 	
 
 	/**
@@ -31,6 +34,7 @@ public class ClientGame {
 		players = playerArray;
 		this.gameBoard = buildBoard();
 		gameGUI = new ClientGUI(this);
+		this.gameAI = new GameAI();
 	}
 
 	public char[][] buildBoard() {
@@ -291,7 +295,7 @@ public class ClientGame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				playerChoice = 0;
+				playerChoice = 1;
 				frame.dispose();
 			}
 		});
@@ -300,7 +304,7 @@ public class ClientGame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				playerChoice = 1;
+				playerChoice = 0;
 				frame.dispose();
 			}
 			
@@ -327,5 +331,9 @@ public class ClientGame {
 			System.out.println("Waiting");
 		}
 		game.gameGUI.displayGame();
+		if (game.playerChoice == 1) {
+			int[] action = game.gameAI.Minimax_Decision(game.getBoard(), 0);
+			game.updateGameState(Arrays.copyOfRange(action, 0, 2), Arrays.copyOfRange(action, 2, action.length));
+		}
 	}
 }
