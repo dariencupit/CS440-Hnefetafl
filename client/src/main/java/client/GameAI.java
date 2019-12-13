@@ -60,7 +60,71 @@ public class GameAI {
 	
 	public int[][] Actions(char[][] state, int player) {
 		
-		return new int[0][0];
+		/*
+		 * Overview
+		 * 
+		 * loop through every piece that matches target
+		 *   scans each direction 
+		 *   	adds each empty location as an action to the output
+		 *   	ends when not an empty space
+		 *   
+		 *   TODO - needs testing
+		 */
+		
+		char targetChar = 'b';
+		if(player == 1) { targetChar = 'w'; }
+		
+		ArrayList<int[]> output = new ArrayList<int[]>();
+		
+		// Loop through each piece
+		for(int y = 0; y < state.length; y++) {
+			for(int x = 0; x < state.length; x++) {
+				// Check if piece is on the current team
+				if(state[y][x] == targetChar) {
+					// search each direction as long as there are empty spaces
+					for(int cy = y + 1; cy < state.length; cy++) {
+						if(state[cy][x] == 'e') {
+							int[] next = {y,x,cy,x};
+							output.add(next);
+						} else {
+							break;
+						}
+					}
+					for(int cy = y - 1; cy >= 0; cy--) {
+						if(state[cy][x] == 'e') {
+							int[] next = {y,x,cy,x};
+							output.add(next);
+						} else {
+							break;
+						}
+					}
+					for(int cx = x + 1; cx < state.length; cx++) {
+						if(state[y][cx] == 'e') {
+							int[] next = {y,x,y,cx};
+							output.add(next);
+						} else {
+							break;
+						}
+					}
+					for(int cx = x - 1; cx >= 0; cx--) {
+						if(state[y][cx] == 'e') {
+							int[] next = {y,x,y,cx};
+							output.add(next);
+						} else {
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		// Convert ArrayList to char[][]
+		int[][] out = new int[output.size()][];
+		for(int i = 0; i < output.size(); i++) {
+			out[i] = output.get(i);
+		}
+		
+		return out;
 	}
 	
 	public static void main(String[] args) {
