@@ -69,7 +69,7 @@ public class GameAI {
 			for(int x = 0; x < state.length; x++) {
 				// Check if piece is on the current team
 				if(state[y][x] == targetChar) {
-					// search each direction as long as there empty spaces
+					// search each direction as long as there are empty spaces
 					for(int cy = y + 1; cy < state.length; cy++) {
 						if(state[cy][x] == 'e') {
 							int[] next = {y,x,cy,x};
@@ -106,7 +106,8 @@ public class GameAI {
 			}
 		}
 		
-		int[][] out = new int[1][output.size()];
+		// Convert ArrayList to char[][]
+		int[][] out = new int[output.size()][];
 		for(int i = 0; i < output.size(); i++) {
 			out[i] = output.get(i);
 		}
