@@ -18,8 +18,15 @@ public class GameAI {
 		
 	}
 	
-	public int[] Minimax_Decision(char[][] state) { // Implements Alpha-Beta Pruning
-		
+	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
+		double[] a = {Double.MIN_VALUE};
+		double[] b = {Double.MAX_VALUE};
+		double value = this.Max_Value(state, player, a, b);
+		int[][] actions = Actions(state, player);
+		for (int[] action : actions) {
+			double val = this.Heuristic(this.Result(state, action));
+			if (val == value) return action;
+		}
 		return new int[0];
 	}
 	
@@ -62,8 +69,14 @@ public class GameAI {
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
-		
-		return new char[0][0];
+		char temp = state[action[2]][action[3]];
+		char[][] newState = new char[11][11];
+		for(int i=0; i < 11; i++)
+			  for(int j=0; j < 11; j++)
+			    newState[i][j]=state[i][j];
+		newState[action[2]][action[3]] = newState[action[0]][action[1]];
+		newState[action[0]][action[1]] = temp;
+		return newState;
 	}
 	
 	public int[][] Actions(char[][] state, int player) {
