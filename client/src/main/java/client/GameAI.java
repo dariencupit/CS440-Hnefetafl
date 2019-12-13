@@ -49,16 +49,14 @@ public class GameAI {
 	public int[][] Actions(char[][] state, int player) {
 		
 		/*
-		 * TODOS
-		 * set target piece determined from player int
-		 * declare output[][]
-		 * loop through every piece that matches target, saving y and x coords
-		 *   check if piece has an empty space around it
-		 *   	if not, continue to next piece
+		 * Overview
+		 * 
+		 * loop through every piece that matches target
 		 *   scans each direction 
 		 *   	adds each empty location as an action to the output
-		 * 
-		 * return output
+		 *   	ends when not an empty space
+		 *   
+		 *   TODO - needs testing
 		 */
 		
 		char targetChar = 'b';
