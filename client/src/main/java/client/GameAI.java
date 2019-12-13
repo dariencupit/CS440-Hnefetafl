@@ -23,20 +23,28 @@ public class GameAI {
 		return new int[0];
 	}
 	
-	public double Max_Value(char[][] state, int player, double a, double b) {
-		
-		return 0.0;
+	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
+		// TODO Find where to increment this.depth and where to put it back to 0
+		if (this.depth == this.limit) return Heuristic(state);
+		double value = Double.MIN_VALUE;
+		int[][] actions = Actions(state, player);
+		for (int[] action : actions) {
+			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b));
+			if (value >= b[0]) return value;
+			a[0] = Double.max(a[0], value); // Change this to be a reference
+		}
+		return value;
 	}
 	
-	public double Min_Value(char[][] state, int player, double a, double b) {
+	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
 		// TODO Find where to increment this.depth and where to put it back to 0
 		if (this.depth == this.limit) return Heuristic(state);
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.max(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
-			if (value <= a) return value;
-			b = Double.min(b, value); // Change this to be a reference
+			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
+			if (value <= a[0]) return value;
+			b[0] = Double.min(b[0], value); // Change this to be a reference
 		}
 		return value;
 	}
