@@ -1,5 +1,10 @@
 package client;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.String;
 import javax.swing.*;
@@ -10,6 +15,7 @@ public class ClientGame {
 	private char[][] gameBoard;
 	private int turn;
 	private String[] players;
+	private int playerChoice = -1;
 	public ClientGUI gameGUI;
 	
 
@@ -273,8 +279,53 @@ public class ClientGame {
 		return turn;
 	}
 	
+	public void displayAI() {
+		JFrame frame = new JFrame("Choose Your Side!");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JLabel label = new JLabel("If you choose White, the game will start and the AI will immediatly make a move.");
+		
+		JButton white = new JButton("White");
+		JButton black = new JButton("Black");
+		
+		white.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playerChoice = 0;
+				frame.dispose();
+			}
+		});
+		
+		black.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playerChoice = 1;
+				frame.dispose();
+			}
+			
+		});
+		
+		JPanel panel = new JPanel();
+		panel.add(white);
+		panel.add(black);
+		
+		frame.add(panel, BorderLayout.SOUTH);
+		
+		frame.getContentPane().add(label, BorderLayout.CENTER);
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
+		frame.pack();
+		frame.setVisible(true);
+	}
+	
 	public static void main(String[] args) throws IOException {
 		ClientGame game = new ClientGame(1, 0, "other");
+		game.displayAI();
+		while (game.playerChoice == -1) {
+			// do nothing
+			System.out.println("Waiting");
+		}
 		game.gameGUI.displayGame();
 	}
 }
