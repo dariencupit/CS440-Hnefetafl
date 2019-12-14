@@ -9,30 +9,26 @@ public class GameAI {
 	//		represent to in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
-	ClientGame clientGame;
 	int depth = 0;
-	final int limit = 3;
-	
-	GameAI (ClientGame game) {
-		this.clientGame = game;
-		
-	}
+	final int limit = 10;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
 		double[] b = {Double.MAX_VALUE};
+		this.depth = 0;
 		double value = this.Max_Value(state, player, a, b);
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			double val = this.Heuristic(this.Result(state, action));
 			if (val == value) return action;
 		}
-		return new int[0];
+		return actions[0];
 	}
 	
 	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
 		// TODO Find where to increment this.depth and where to put it back to 0
 		if (this.depth == this.limit) return Heuristic(state);
+		this.depth++;
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
@@ -46,6 +42,7 @@ public class GameAI {
 	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
 		// TODO Find where to increment this.depth and where to put it back to 0
 		if (this.depth == this.limit) return Heuristic(state);
+		this.depth++;
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
