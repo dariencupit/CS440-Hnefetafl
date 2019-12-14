@@ -18,25 +18,40 @@ public class GameAI {
 		
 	}
 	
-	public int[] Minimax_Decision(char[][] state) { // Implements Alpha-Beta Pruning
-		
+	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
+		double[] a = {Double.MIN_VALUE};
+		double[] b = {Double.MAX_VALUE};
+		double value = this.Max_Value(state, player, a, b);
+		int[][] actions = Actions(state, player);
+		for (int[] action : actions) {
+			double val = this.Heuristic(this.Result(state, action));
+			if (val == value) return action;
+		}
 		return new int[0];
 	}
 	
-	public double Max_Value(char[][] state, int player, double a, double b) {
-		
-		return 0.0;
+	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
+		// TODO Find where to increment this.depth and where to put it back to 0
+		if (this.depth == this.limit) return Heuristic(state);
+		double value = Double.MIN_VALUE;
+		int[][] actions = Actions(state, player);
+		for (int[] action : actions) {
+			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b));
+			if (value >= b[0]) return value;
+			a[0] = Double.max(a[0], value); // Change this to be a reference
+		}
+		return value;
 	}
 	
-	public double Min_Value(char[][] state, int player, double a, double b) {
+	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
 		// TODO Find where to increment this.depth and where to put it back to 0
 		if (this.depth == this.limit) return Heuristic(state);
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.max(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
-			if (value <= a) return value;
-			b = Double.min(b, value); // Change this to be a reference
+			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
+			if (value <= a[0]) return value;
+			b[0] = Double.min(b[0], value); // Change this to be a reference
 		}
 		return value;
 	}
@@ -54,8 +69,14 @@ public class GameAI {
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
-		
-		return new char[0][0];
+		char temp = state[action[2]][action[3]];
+		char[][] newState = new char[11][11];
+		for(int i=0; i < 11; i++)
+			  for(int j=0; j < 11; j++)
+			    newState[i][j]=state[i][j];
+		newState[action[2]][action[3]] = newState[action[0]][action[1]];
+		newState[action[0]][action[1]] = temp;
+		return newState;
 	}
 	
 	public int[][] Actions(char[][] state, int player) {
