@@ -10,7 +10,7 @@ public class GameAI {
 	// State
 	//		- State is represented as a double char array of characters
 	int depth = 0;
-	final int limit = 3;
+	final int limit = 10;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
