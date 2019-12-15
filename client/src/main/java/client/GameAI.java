@@ -16,6 +16,7 @@ public class GameAI {
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
 		double[] b = {Double.MAX_VALUE};
+		this.depth = 0;
 		double value = this.Max_Value(state, player, a, b);
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
@@ -29,8 +30,10 @@ public class GameAI {
 	}
 	
 	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
+
 		// TODO Find where action increment this.depth and where action put it back action 0
 		if (this.depth == this.limit) return Eval(state);
+
 		this.depth++;
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
@@ -43,8 +46,10 @@ public class GameAI {
 	}
 	
 	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
+
 		// TODO Find where action increment this.depth and where action put it back action 0
 		if (this.depth == this.limit) return Eval(state);
+
 		this.depth++;
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
