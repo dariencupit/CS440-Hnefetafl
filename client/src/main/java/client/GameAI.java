@@ -10,53 +10,48 @@ public class GameAI {
 	//		represent action in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
-	int depth = 0;
-	final int limit = 10;
+	final int limit = 2;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
 		double[] b = {Double.MAX_VALUE};
-		this.depth = 0;
-		double value = this.Max_Value(state, player, a, b);
+		double value = this.Max_Value(state, player, a, b, 0);
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			double val = this.Eval(this.Result(state, action), player);
 			if (val == value) {
-				this.depth = 0;
 				return action;
 			}
 		}
-		return actions[0];
+		return new int[4];
 	}
 	
-	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
+	public double Max_Value(char[][] state, int player, double[] a, double b[], int depth) {
 
-		// TODO Find where action increment this.depth and where action put it back action 0
-		if (this.depth == this.limit) return Eval(state, player);
+		//System.out.println("Max: " + depth);
+		if (depth == this.limit) return Eval(state, player);
 
-		this.depth++;
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b));
+			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
 			if (value >= b[0]) return value;
-			a[0] = Double.max(a[0], value); // Change this action be a reference
+			a[0] = Double.max(a[0], value); // Change this to be a reference
 		}
 		return value;
 	}
 	
-	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
-
-		// TODO Find where action increment this.depth and where action put it back action 0
-		if (this.depth == this.limit) return Eval(state, player);
-
-		this.depth++;
+	public double Min_Value(char[][] state, int player, double[] a, double[] b, int depth) {
+		
+		//System.out.println("Min: " + depth);
+		if (depth == this.limit) return Eval(state, player);
+		
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
+			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
 			if (value <= a[0]) return value;
-			b[0] = Double.min(b[0], value); // Change this action be a reference
+			b[0] = Double.min(b[0], value); // Change this to be a reference
 		}
 		return value;
 	}
@@ -68,6 +63,31 @@ public class GameAI {
 		return new_player;
 	}
 	
+	public double Eval_Black(char[][] state) {
+		
+		return 2.0;
+	}
+	
+	public double Eval(char[][] state, int player) {
+		
+		double score = 0.0;
+		
+		int blackCount = 0;
+		int whiteCount = 0;
+		
+		for (int i = 0; i < 11; i++) {
+			for (int j = 0; j < 11; j++) {
+				if (state[i][j] == 'b') blackCount++;
+				else if (state[i][j] == 'w') whiteCount++;
+			}
+		}
+		
+		if (player == 0) score += blackCount * 1;
+		else score += whiteCount * 2;
+		if (score < 24) System.out.println(score);
+		return score;
+	}
+
 	public boolean King_Captured(char[][] state) {
 		
 		// Find the king
@@ -112,11 +132,6 @@ public class GameAI {
 		}
 		
 		return value;
-	}
-	
-	public double Eval(char[][] state, int player) {
-		Random rand = new Random();
-		return rand.nextDouble();
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
@@ -273,7 +288,6 @@ public class GameAI {
 				}
 			}
 		}
-		
 		// Convert ArrayList to char[][]
 		int[][] out = new int[output.size()][];
 		for(int i = 0; i < output.size(); i++) {
