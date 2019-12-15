@@ -23,7 +23,7 @@ public class GameAI {
 				return action;
 			}
 		}
-		return actions[0];
+		return new int[4];
 	}
 	
 	public double Max_Value(char[][] state, int player, double[] a, double b[], int depth) {
@@ -86,6 +86,52 @@ public class GameAI {
 		else score += whiteCount * 2;
 		if (score < 24) System.out.println(score);
 		return score;
+	}
+
+	public boolean King_Captured(char[][] state) {
+		
+		// Find the king
+		int ky = -1, kx = -1;
+		for(int y = 0; y < state.length; y++) {
+			if(ky != -1) break;
+			for(int x = 0; x < state.length; x++) {
+				// check if king
+				if(state[y][x] == 'k') {
+					ky = y; kx = x;
+					break;
+				}
+			}
+		}
+		
+		// Lose state check
+		
+		boolean lost = true;
+		if(ky == state.length - 1 || ky == 0 || kx == state.length || kx == 0) {
+			lost = false;
+		} else {
+			//if()
+		}
+		
+		return lost;
+	}
+	
+	public double Eval_White(char[][] state) {
+		/* Overview:
+		 * 
+		 * Win state = 100
+		 * lose state = -100
+		 * # of spaces away from nearest corner = -1 each
+		 */
+		
+		double value = 0;
+		// Win state check
+		if(state[0][0] == 'k' || state[0][state.length-1] == 'k' || state[state.length-1][0] == 'k' || state[state.length-1][state.length-1] == 'k') {
+			value = 100;
+		} else if(King_Captured(state)) {
+			value = -100;
+		}
+		
+		return value;
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
@@ -209,32 +255,32 @@ public class GameAI {
 					// search each direction as long as there are empty spaces
 					for(int cy = y + 1; cy < state.length; cy++) {
 						if(state[cy][x] == 'e') {
-							int[] next = {y,x,cy,x};
-							output.add(next);
+							//int[] next = {y,x,cy,x};
+							output.add(new int[] {y,x,cy,x});
 						} else {
 							break;
 						}
 					}
 					for(int cy = y - 1; cy >= 0; cy--) {
 						if(state[cy][x] == 'e') {
-							int[] next = {y,x,cy,x};
-							output.add(next);
+							//int[] next = {y,x,cy,x};
+							output.add(new int[] {y,x,cy,x});
 						} else {
 							break;
 						}
 					}
 					for(int cx = x + 1; cx < state.length; cx++) {
 						if(state[y][cx] == 'e') {
-							int[] next = {y,x,y,cx};
-							output.add(next);
+							//int[] next = {y,x,y,cx};
+							output.add(new int[] {y,x,y,cx});
 						} else {
 							break;
 						}
 					}
 					for(int cx = x - 1; cx >= 0; cx--) {
 						if(state[y][cx] == 'e') {
-							int[] next = {y,x,y,cx};
-							output.add(next);
+							//int[] next = {y,x,y,cx};
+							output.add(new int[] {y,x,y,cx});
 						} else {
 							break;
 						}
@@ -246,6 +292,8 @@ public class GameAI {
 		int[][] out = new int[output.size()][];
 		for(int i = 0; i < output.size(); i++) {
 			out[i] = output.get(i);
+			//ArrayList<int> row = output.get(i);
+			//out[i] = row.toArray(new int[row.size()]);
 		}
 		
 		return out;
