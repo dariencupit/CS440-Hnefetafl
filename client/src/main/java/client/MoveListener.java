@@ -50,10 +50,9 @@ public class MoveListener implements ActionListener {
 			try {
 				game.updateGameState(sourceCoordinates, destCoordinates);
 				if (game.playerChoice != game.getTurn()) {
-					int playerAI = 0;
-					if (game.playerChoice == 1) playerAI = 0;
-					else playerAI = 1;
-					int[] action = game.gameAI.Minimax_Decision(game.getBoard(), playerAI);
+					int[] action = new int[4];
+					if (game.playerChoice == 0 ) action = game.gameAI.Minimax_Decision(game.getBoard(), 1);
+					else action = game.gameAI.Minimax_Decision(game.getBoard(), 0);
 					game.updateGameState(Arrays.copyOfRange(action, 0, 2), Arrays.copyOfRange(action, 2, action.length));
 				}
 			} catch (IOException e) {
