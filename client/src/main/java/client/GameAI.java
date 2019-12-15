@@ -1,22 +1,17 @@
 package client;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class GameAI {
 	// Action
 	//		- An action is represented as an int array with a size of 4
 	//		The first two slots in the array represent from, and the last two
-	//		represent to in the form of y,x
+	//		represent action in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
-	ClientGame clientGame;
 	int depth = 0;
-	final int limit = 3;
-	
-	GameAI (ClientGame game) {
-		this.clientGame = game;
-		
-	}
+	final int limit = 10;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
@@ -24,34 +19,39 @@ public class GameAI {
 		double value = this.Max_Value(state, player, a, b);
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			double val = this.Heuristic(this.Result(state, action));
-			if (val == value) return action;
+			double val = this.Eval(this.Result(state, action));
+			if (val == value) {
+				this.depth = 0;
+				return action;
+			}
 		}
-		return new int[0];
+		return actions[0];
 	}
 	
 	public double Max_Value(char[][] state, int player, double[] a, double b[]) {
-		// TODO Find where to increment this.depth and where to put it back to 0
-		if (this.depth == this.limit) return Heuristic(state);
+		// TODO Find where action increment this.depth and where action put it back action 0
+		if (this.depth == this.limit) return Eval(state);
+		this.depth++;
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b));
 			if (value >= b[0]) return value;
-			a[0] = Double.max(a[0], value); // Change this to be a reference
+			a[0] = Double.max(a[0], value); // Change this action be a reference
 		}
 		return value;
 	}
 	
 	public double Min_Value(char[][] state, int player, double[] a, double[] b) {
-		// TODO Find where to increment this.depth and where to put it back to 0
-		if (this.depth == this.limit) return Heuristic(state);
+		// TODO Find where action increment this.depth and where action put it back action 0
+		if (this.depth == this.limit) return Eval(state);
+		this.depth++;
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b));
 			if (value <= a[0]) return value;
-			b[0] = Double.min(b[0], value); // Change this to be a reference
+			b[0] = Double.min(b[0], value); // Change this action be a reference
 		}
 		return value;
 	}
@@ -63,9 +63,9 @@ public class GameAI {
 		return new_player;
 	}
 	
-	public double Heuristic(char[][] state) {
-		
-		return 0.0;
+	public double Eval(char[][] state) {
+		Random rand = new Random();
+		return rand.nextDouble();
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
@@ -76,6 +76,90 @@ public class GameAI {
 			    newState[i][j]=state[i][j];
 		newState[action[2]][action[3]] = newState[action[0]][action[1]];
 		newState[action[0]][action[1]] = temp;
+		
+		if (action[2] > 1) { // check action make sure it wont go out of bounds
+			char twoUp = newState[action[2] - 2][action[3]];
+			char oneUp = newState[action[2] - 1][action[3]];
+			char current = newState[action[2]][action[3]];
+			
+			if ((oneUp != current) && (oneUp != 'e') && (oneUp != 'k')) { // checks if there is an enemy piece next action moved piece
+				
+				if (current == twoUp || (current == 'w' && twoUp == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+					newState[action[2] - 1][action[3]] = 'e';
+				}
+				
+				else if ((action[2] - 2 == 0 && action[3] == 0) || (action[2] - 2 == 0 && action[3] == 10)) { // checks corners
+					newState[action[2] - 1][action[3]] = 'e';
+				}
+				
+				else if ((action[2] - 2 == 5 && action[3] == 5) && twoUp != 'k') { // checks throne
+					newState[action[2] - 1][action[3]] = 'e';
+				}
+			}
+		}
+		
+		if (action[3] < 9) { // check action make sure it wont go out of bounds 
+			char twoRight = newState[action[2]][action[3] + 2];
+			char oneRight = newState[action[2]][action[3] + 1];
+			char current = newState[action[2]][action[3]];
+			
+			if ((oneRight != current) && (oneRight != 'e') && (oneRight != 'k')) { // checks if there is an enemy piece next action moved piece
+				
+				if (current == twoRight || (current == 'w' && twoRight == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+					newState[action[2]][action[3] + 1] = 'e';
+				}
+				
+				else if ((action[2] == 0 && action[3] + 2 == 10) || (action[2] == 10 && action[3] + 2 == 10)) { // checks corners
+					newState[action[2]][action[3] + 1] = 'e';
+				}
+				
+				else if ((action[2] == 5 && action[3] + 2 == 5) && twoRight != 'k') { // checks throne
+					newState[action[2]][action[3] + 1] = 'e';
+				}
+			}
+		}
+		
+		if (action[2] < 9) { // check action make sure it wont go out of bounds
+			char twoDown = newState[action[2] + 2][action[3]];
+			char oneDown = newState[action[2] + 1][action[3]];
+			char current = newState[action[2]][action[3]];
+			
+			if ((oneDown != current) && (oneDown != 'e') && (oneDown != 'k')) { // checks if there is an enemy piece next action moved piece
+				
+				if (current == twoDown || (current == 'w' && twoDown == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+					newState[action[2] + 1][action[3]] = 'e';
+				}
+				
+				else if ((action[2] + 2 == 10 && action[3] == 0) || (action[2] + 2 == 10 && action[3] == 10)) { // checks corners
+					newState[action[2] + 1][action[3]] = 'e';
+				}
+				
+				else if ((action[2] + 2 == 5 && action[3] == 5) && twoDown != 'k') { // checks throne
+					newState[action[2] + 1][action[3]] = 'e';
+				}
+			}
+		}
+		
+		if (action[3] > 1) { // check action make sure it wont go out of bounds
+			char twoLeft = newState[action[2]][action[3] - 2];
+			char oneLeft = newState[action[2]][action[3] - 1];
+			char current = newState[action[2]][action[3]];
+			
+			if ((oneLeft != current) && (oneLeft != 'e') && (oneLeft != 'k')) { // checks if there is an enemy piece next action moved piece
+				
+				if (current == twoLeft || (current == 'w' && twoLeft == 'k')) { // checks if enemy piece is capturable and it isnt a king
+					newState[action[2]][action[3] - 1] = 'e';
+				}
+				
+				else if ((action[2] == 0 && action[3] - 2 == 0) || (action[2] == 10 && action[3] - 2 == 0)) { // checks corners
+					newState[action[2]][action[3] - 1] = 'e';
+				}
+				
+				else if ((action[2] == 5 && action[3] - 2 == 5) && twoLeft != 'k') { // checks throne
+					newState[action[2]][action[3] - 1] = 'e';
+				}
+			}
+		}
 		return newState;
 	}
 	
@@ -86,7 +170,7 @@ public class GameAI {
 		 * 
 		 * loop through every piece that matches target
 		 *   scans each direction 
-		 *   	adds each empty location as an action to the output
+		 *   	adds each empty location as an action action the output
 		 *   	ends when not an empty space
 		 *   
 		 *   TODO - needs testing
