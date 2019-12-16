@@ -1,7 +1,8 @@
 package client;
 
 import java.util.ArrayList;
-import java.util.Random;
+//import java.util.Random;
+import java.lang.Math;
 
 public class GameAI {
 	// Action
@@ -88,8 +89,7 @@ public class GameAI {
 		return score;
 	}
 
-	public boolean King_Captured(char[][] state) {
-		
+	public int[] King_Coords(char[][] state) {
 		// Find the king
 		int ky = -1, kx = -1;
 		for(int y = 0; y < state.length; y++) {
@@ -102,14 +102,33 @@ public class GameAI {
 				}
 			}
 		}
+		int[] out = {ky, kx};
+		return out;
+	}
+	
+	public boolean King_Captured(char[][] state) {
+		
+		// Find the king
+		int ky,kx;
+		int[] kingCoords = King_Coords(state);
+		ky = kingCoords[0]; kx = kingCoords[1];
 		
 		// Lose state check
-		
 		boolean lost = true;
 		if(ky == state.length - 1 || ky == 0 || kx == state.length || kx == 0) {
 			lost = false;
 		} else {
-			//if()
+			// For each direction, it checks to see if next to a black piece or the throne
+			// TODO - needs testing
+			if(state[ky+1][kx] != 'b' || (ky != 5-1 || kx != 5)) {
+				lost = false;
+			} else if(state[ky-1][kx] != 'b' || (ky != 5+1 || kx != 5)) {
+				lost = false;
+			} else if(state[ky][kx+1] != 'b' || (ky != 5 || kx != 5-1)) {
+				lost = false;
+			} else if(state[ky][kx-1] != 'b' || (ky != 5 || kx != 5+1)) {
+				lost = false;
+			}
 		}
 		
 		return lost;
@@ -120,16 +139,24 @@ public class GameAI {
 		 * 
 		 * Win state = 100
 		 * lose state = -100
-		 * # of spaces away from nearest corner = -1 each
+		 * # of spaces away the center = 1 each
 		 */
 		
 		double value = 0;
 		// Win state check
 		if(state[0][0] == 'k' || state[0][state.length-1] == 'k' || state[state.length-1][0] == 'k' || state[state.length-1][state.length-1] == 'k') {
 			value = 100;
-		} else if(King_Captured(state)) {
+		} 
+		// Lost state check
+		else if(King_Captured(state)) {
 			value = -100;
 		}
+		
+		//number of spaces away from center calculation
+		//TODO - needs testing
+		int[] kingCoords = King_Coords(state);
+		int spacesFromCenter = Math.abs(kingCoords[0] - 5) + Math.abs(kingCoords[1] - 5);
+		value += spacesFromCenter;
 		
 		return value;
 	}
@@ -292,8 +319,6 @@ public class GameAI {
 		int[][] out = new int[output.size()][];
 		for(int i = 0; i < output.size(); i++) {
 			out[i] = output.get(i);
-			//ArrayList<int> row = output.get(i);
-			//out[i] = row.toArray(new int[row.size()]);
 		}
 		
 		return out;
