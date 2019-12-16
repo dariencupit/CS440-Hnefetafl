@@ -10,32 +10,40 @@ public class GameAI {
 	//		represent action in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
-	final int limit = 2;
+	final int limit = 3;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		double[] a = {Double.MIN_VALUE};
 		double[] b = {Double.MAX_VALUE};
 		double value = this.Max_Value(state, player, a, b, 0);
+		System.out.println("Value: " + value);
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
+			for (int i = 0; i < action.length; i ++) System.out.print(action[i] + " ,");
 			double val = this.Eval(this.Result(state, action), player);
+			System.out.print("val: " + val +" \n");
 			if (val == value) {
 				return action;
 			}
 		}
+		System.out.println("Did not return an action");
 		return new int[4];
 	}
 	
 	public double Max_Value(char[][] state, int player, double[] a, double b[], int depth) {
 
-		//System.out.println("Max: " + depth);
 		if (depth == this.limit) return Eval(state, player);
 
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
-			if (value >= b[0]) return value;
+			if (value >= b[0]) {
+				System.out.print("Depth: " + depth + " Action: ");
+				for (int i = 0; i < action.length; i ++) System.out.print(action[i] + " ,");
+				System.out.println();
+				return value;
+			}
 			a[0] = Double.max(a[0], value); // Change this to be a reference
 		}
 		return value;
@@ -43,7 +51,6 @@ public class GameAI {
 	
 	public double Min_Value(char[][] state, int player, double[] a, double[] b, int depth) {
 		
-		//System.out.println("Min: " + depth);
 		if (depth == this.limit) return Eval(state, player);
 		
 		double value = Double.MAX_VALUE;
@@ -82,9 +89,8 @@ public class GameAI {
 			}
 		}
 		
-		if (player == 0) score += blackCount * 1;
-		else score += whiteCount * 2;
-		if (score < 24) System.out.println(score);
+		score += blackCount * 1;
+		
 		return score;
 	}
 
