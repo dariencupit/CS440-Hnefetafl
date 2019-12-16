@@ -34,17 +34,6 @@ public class GameAI {
 
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
-		// --
-		System.out.println("Next piece");
-		for(int i = 0; i<actions.length; i++)
-		{
-		    for(int j = 0; j<actions[i].length; j++)
-		    {
-		        System.out.print(actions[i][j]);
-		    }
-		    System.out.println();
-		}
-		// --
 		for (int[] action : actions) {
 			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
 			if (value >= b[0]) return value;
