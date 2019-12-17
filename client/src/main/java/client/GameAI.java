@@ -1,6 +1,7 @@
 package client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 //import java.util.Random;
 import java.lang.Math;
 
@@ -15,20 +16,21 @@ public class GameAI {
 	int playerAI = 0;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
-		
 		playerAI = player;
-		double a = - Double.MAX_VALUE;
-		double b = Double.MAX_VALUE;
-		double value = - Double.MAX_VALUE;
+		double a = Double.NEGATIVE_INFINITY;
+		double b = Double.POSITIVE_INFINITY;
+		double value = Double.NEGATIVE_INFINITY;
 		int[] maxAction = {0,0,0,0};
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			double val = Alpha_Beta(Result(state, action), Switch_Player(player), 1, a, b);
+			//System.out.println("Action: " + Arrays.toString(action) + " Score: " + val);
 			if (val > value) {
 				maxAction = action;
 				value = val;
 			}
 		}
+		System.out.println("Final Action: " + Arrays.toString(maxAction) + "Final Score: " + value);
 		return maxAction;
 	}
 	
@@ -38,21 +40,25 @@ public class GameAI {
 		if (depth == this.limit) return Eval(state, player);
 		
 		if (player == this.playerAI) {
+			double value = Double.NEGATIVE_INFINITY;
 			int[][] actions = Actions(state, player);
 			for (int[] action : actions) {
-				a = Double.max(a, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				value = Double.max(value, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				a = Double.max(a, value);
 				if (b <= a) break;
 			}
-			return a;
+			return value;
 		}
 		
 		else {
+			double value = Double.POSITIVE_INFINITY;
 			int[][] actions = Actions(state, player);
 			for (int[] action : actions) {
-				b = Double.min(b, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				value = Double.min(value, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				b = Double.min(b, value);
 				if (b <= a) break;
 			}
-			return b;
+			return value;
 		}
 	}
 	
@@ -79,7 +85,7 @@ public class GameAI {
 		
 		if (depth == this.limit) return Eval(state, player);
 		
-		double value = Double.MAX_VALUE;
+		double value = Double.POSITIVE_INFINITY;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
 			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), depth + 1));
@@ -101,14 +107,14 @@ public class GameAI {
 		double score = 0.0;
 		
 		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
-			score -= 25;
+			score -= 50;
 		}
 		
 		int y = kingCoords[0];
 		int x = kingCoords[1];
 		if((y != 10 && y != 0) && (x != 10 && x != 0)) {
 			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
-				score += 25;
+				score += 50;
 			}
 		}
 		
@@ -140,7 +146,7 @@ public class GameAI {
 			int difference = blackCount - (whiteCount * 2);
 			score += difference;
 			if(blackCount < 4) {
-				score -= 25;
+				score -= 50;
 			}
 		}
 		else {
@@ -149,10 +155,9 @@ public class GameAI {
 			int difference = (whiteCount * 2) - blackCount;
 			score += difference;
 			if(blackCount < 4) {
-				score += 25;
+				score += 50;
 			}
 		}
-		
 		return score;
 	}
 	
@@ -188,14 +193,14 @@ public class GameAI {
 		double score = 0;
 		
 		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
-			score += 25;
+			score += 50;
 		}
 		
 		int y = kingCoords[0];
 		int x = kingCoords[1];
 		if ((y != 10 && y != 0) && (x != 10 && x != 0)) {
 			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
-				score -= 25;
+				score -= 50;
 			}
 		}
 		
@@ -216,9 +221,9 @@ public class GameAI {
 			char oneUp = newState[action[2] - 1][action[3]];
 			char current = newState[action[2]][action[3]];
 			
-			if ((oneUp != current) && (oneUp != 'e') && (oneUp != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneUp != current && current != 'k') || (current == 'k' && oneUp == 'e')) && (oneUp != 'e') && (oneUp != 'k')) { // checks if there is an enemy piece next action moved piece
 				
-				if (current == twoUp || (current == 'w' && twoUp == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+				if (current == twoUp || (current == 'w' && twoUp == 'k') || (current == 'k' && twoUp == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2] - 1][action[3]] = 'e';
 				}
 				
@@ -237,9 +242,9 @@ public class GameAI {
 			char oneRight = newState[action[2]][action[3] + 1];
 			char current = newState[action[2]][action[3]];
 			
-			if ((oneRight != current) && (oneRight != 'e') && (oneRight != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneRight != current && current != 'k') || (current == 'k' && oneRight == 'e')) && (oneRight != 'e') && (oneRight != 'k')) { // checks if there is an enemy piece next action moved piece
 				
-				if (current == twoRight || (current == 'w' && twoRight == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+				if (current == twoRight || (current == 'w' && twoRight == 'k') || (current == 'k' && twoRight == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2]][action[3] + 1] = 'e';
 				}
 				
@@ -258,9 +263,9 @@ public class GameAI {
 			char oneDown = newState[action[2] + 1][action[3]];
 			char current = newState[action[2]][action[3]];
 			
-			if ((oneDown != current) && (oneDown != 'e') && (oneDown != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneDown != current && current != 'k') || (current == 'k' && oneDown == 'e')) && (oneDown != 'e') && (oneDown != 'k')) { // checks if there is an enemy piece next action moved piece
 				
-				if (current == twoDown || (current == 'w' && twoDown == 'k')) { // checks if enemy piece is capturable  and it isnt a king
+				if (current == twoDown || (current == 'w' && twoDown == 'k') || (current == 'k' && twoDown == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2] + 1][action[3]] = 'e';
 				}
 				
@@ -279,9 +284,9 @@ public class GameAI {
 			char oneLeft = newState[action[2]][action[3] - 1];
 			char current = newState[action[2]][action[3]];
 			
-			if ((oneLeft != current) && (oneLeft != 'e') && (oneLeft != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneLeft != current && current != 'k') || (current == 'k' && oneLeft == 'e')) && (oneLeft != 'e') && (oneLeft != 'k')) { // checks if there is an enemy piece next action moved piece
 				
-				if (current == twoLeft || (current == 'w' && twoLeft == 'k')) { // checks if enemy piece is capturable and it isnt a king
+				if (current == twoLeft || (current == 'w' && twoLeft == 'k') || (current == 'k' && twoLeft == 'w')) { // checks if enemy piece is capturable and it isnt a king
 					newState[action[2]][action[3] - 1] = 'e';
 				}
 				
@@ -294,6 +299,7 @@ public class GameAI {
 				}
 			}
 		}
+		//if (Eval(newState, 0) < 0) System.out.println("Action; " + Arrays.toString(action) + " Score: " + Eval(newState, 0));
 		return newState;
 	}
 	
