@@ -107,15 +107,21 @@ public class GameAI {
 		
 		int blackCount = 0;
 		int whiteCount = 0;
+		int[] kingCoords = new int[2];
 		
 		for (int i = 0; i < 11; i++) {
 			for (int j = 0; j < 11; j++) {
 				if (state[i][j] == 'b') blackCount++;
 				else if (state[i][j] == 'w') whiteCount++;
+				else if (state[i][j] == 'k') {
+					kingCoords[0] = i;
+					kingCoords[1] = j;
+				}
 			}
 		}
 		
-		score += blackCount * 1;
+		if (this.playerAI == 0) score += blackCount;
+		else score += whiteCount * 2;
 		
 		return score;
 	}
