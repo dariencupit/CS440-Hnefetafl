@@ -265,8 +265,9 @@ public class GameAI {
 		 *   scans each direction 
 		 *   	adds each empty location as an action action the output
 		 *   	ends when not an empty space
+		 * Some tricky mechanics with corners, middle square, and king moves
+ 		 *	- only the king can move to corners and throne
 		 *   
-		 *   TODO - needs testing
 		 */
 		
 		char targetChar = 'b';
@@ -278,36 +279,66 @@ public class GameAI {
 		for(int y = 0; y < state.length; y++) {
 			for(int x = 0; x < state.length; x++) {
 				// Check if piece is on the current team
-				if(state[y][x] == targetChar) {
-					// search each direction as long as there are empty spaces
-					for(int cy = y + 1; cy < state.length; cy++) {
+				boolean kingPiece = false;
+				if(state[y][x] == 'k' && player == 1) kingPiece = true;
+				if(state[y][x] == targetChar || kingPiece) {
+					// Search each direction as long as there are empty spaces
+					// Down
+					int ymax = state.length;
+					if((x == 0 || x == state.length-1) && !kingPiece) ymax--;
+					for(int cy = y + 1; cy < ymax; cy++) {
 						if(state[cy][x] == 'e') {
-							//int[] next = {y,x,cy,x};
-							output.add(new int[] {y,x,cy,x});
+							if(cy == 5 && x == 5) {
+								if(kingPiece) output.add(new int[] {y,x,cy,x});
+								else break;
+							} else {
+								output.add(new int[] {y,x,cy,x});
+							}
 						} else {
 							break;
 						}
 					}
-					for(int cy = y - 1; cy >= 0; cy--) {
+					// Up
+					int ymin = 0;
+					if((x == 0 || x == state.length-1) && !kingPiece) ymin++;
+					for(int cy = y - 1; cy >= ymin; cy--) {
 						if(state[cy][x] == 'e') {
-							//int[] next = {y,x,cy,x};
-							output.add(new int[] {y,x,cy,x});
+							if(cy == 5 && x == 5) {
+								if(kingPiece) output.add(new int[] {y,x,cy,x});
+								else break;
+							} else {
+								output.add(new int[] {y,x,cy,x});
+							}
 						} else {
 							break;
 						}
 					}
-					for(int cx = x + 1; cx < state.length; cx++) {
+					// Right
+					int xmax = state.length;
+					if((y == 0 || y == state.length-1) && !kingPiece) xmax--;
+					for(int cx = x + 1; cx < xmax; cx++) {
 						if(state[y][cx] == 'e') {
-							//int[] next = {y,x,y,cx};
-							output.add(new int[] {y,x,y,cx});
+							if(y == 5 && cx == 5) {
+								if(kingPiece) output.add(new int[] {y,x,y,cx});
+								else break;
+							} else {
+								output.add(new int[] {y,x,y,cx});
+							}
 						} else {
 							break;
 						}
 					}
-					for(int cx = x - 1; cx >= 0; cx--) {
+					// Left
+					int xmin = 0;
+					if((y == 0 || y == state.length-1) && !kingPiece) xmin++;
+					for(int cx = x - 1; cx >= xmin; cx--) {
 						if(state[y][cx] == 'e') {
-							//int[] next = {y,x,y,cx};
-							output.add(new int[] {y,x,y,cx});
+							if(y == 5 && cx == 5) {
+								if(kingPiece) output.add(new int[] {y,x,y,cx});
+								else break;
+							} else {
+								output.add(new int[] {y,x,y,cx});
+							}
 						} else {
 							break;
 						}
