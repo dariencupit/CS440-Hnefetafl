@@ -12,57 +12,82 @@ public class GameAI {
 	// State
 	//		- State is represented as a double char array of characters
 	final int limit = 3;
+	int playerAI = 0;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
-		double[] a = {Double.MIN_VALUE};
-		double[] b = {Double.MAX_VALUE};
-		double value = this.Max_Value(state, player, a, b, 0);
-		System.out.println("Value: " + value);
+		
+		playerAI = player;
+		double a = Double.MIN_VALUE;
+		double b = Double.MAX_VALUE;
+		double value = Double.MIN_VALUE;
+		int[] maxAction = {0,0,0,0};
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			for (int i = 0; i < action.length; i ++) System.out.print(action[i] + " ,");
-			double val = this.Eval(this.Result(state, action), player);
-			System.out.print("val: " + val +" \n");
-			if (val == value) {
-				return action;
+			double val = Alpha_Beta(Result(state, action), Switch_Player(player), 1, a, b);
+			if (val > value) {
+				maxAction = action;
+				value = val;
 			}
 		}
-		System.out.println("Did not return an action");
-		return new int[4];
+		return maxAction;
 	}
 	
-	public double Max_Value(char[][] state, int player, double[] a, double b[], int depth) {
+	//  Russell, Stuart J.; Norvig, Peter (2003), Artificial Intelligence: A Modern Approach (2nd ed.), Upper Saddle River, New Jersey: Prentice Hall, ISBN 0-13-790395-2
+	public double Alpha_Beta(char[][] state, int player, int depth, double a, double b) {
+		
+		if (depth == this.limit) return Eval(state, player);
+		
+		if (player == this.playerAI) {
+			int[][] actions = Actions(state, player);
+			for (int[] action : actions) {
+				a = Double.max(a, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				if (b <= a) break;
+			}
+			return a;
+		}
+		
+		else {
+			int[][] actions = Actions(state, player);
+			for (int[] action : actions) {
+				b = Double.min(b, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				if (b <= a) break;
+			}
+			return b;
+		}
+	}
+	
+	/*public double Max_Value(char[][] state, int player, int depth) {
 
 		if (depth == this.limit) return Eval(state, player);
 
 		double value = Double.MIN_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
-			if (value >= b[0]) {
-				System.out.print("Depth: " + depth + " Action: ");
-				for (int i = 0; i < action.length; i ++) System.out.print(action[i] + " ,");
-				System.out.println();
-				return value;
-			}
-			a[0] = Double.max(a[0], value); // Change this to be a reference
+			value = Double.max(value, this.Min_Value(Result(state, action), this.Switch_Player(player), depth + 1));
+		//	if (value >= this.b) {
+		//		System.out.print("Depth: " + depth + " Action: ");
+		//		for (int i = 0; i < action.length; i ++) System.out.print(action[i] + " ,");
+		//		System.out.println();
+		//		return value;
+		//	}
+		//	this.a = Double.max(this.a, value); // Change this to be a reference
 		}
 		return value;
-	}
+	}*/
 	
-	public double Min_Value(char[][] state, int player, double[] a, double[] b, int depth) {
+	/*public double Min_Value(char[][] state, int player, int depth) {
 		
 		if (depth == this.limit) return Eval(state, player);
 		
 		double value = Double.MAX_VALUE;
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
-			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), a, b, depth + 1));
-			if (value <= a[0]) return value;
-			b[0] = Double.min(b[0], value); // Change this to be a reference
+			value = Double.min(value, this.Max_Value(Result(state, action), this.Switch_Player(player), depth + 1));
+			//if (value <= this.a) return value;
+			//this.b = Double.min(this.b, value); // Change this to be a reference
 		}
 		return value;
-	}
+	}*/
 	
 	public int Switch_Player(int current_player) {
 		int new_player;
