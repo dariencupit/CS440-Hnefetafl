@@ -17,9 +17,9 @@ public class GameAI {
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
 		
 		playerAI = player;
-		double a = Double.MIN_VALUE;
+		double a = - Double.MAX_VALUE;
 		double b = Double.MAX_VALUE;
-		double value = Double.MIN_VALUE;
+		double value = - Double.MAX_VALUE;
 		int[] maxAction = {0,0,0,0};
 		int[][] actions = Actions(state, player);
 		for (int[] action : actions) {
@@ -96,9 +96,23 @@ public class GameAI {
 		return new_player;
 	}
 	
-	public double Eval_Black(char[][] state) {
+	public double Eval_Black(char[][] state, int[] kingCoords) {
 		
-		return 2.0;
+		double score = 0.0;
+		
+		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
+			score -= 25;
+		}
+		
+		int y = kingCoords[0];
+		int x = kingCoords[1];
+		if((y != 10 && y != 0) && (x != 10 && x != 0)) {
+			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
+				score += 25;
+			}
+		}
+		
+		return score;
 	}
 	
 	public double Eval(char[][] state, int player) {
@@ -120,34 +134,32 @@ public class GameAI {
 			}
 		}
 		
-		if (this.playerAI == 0) score += blackCount;
-		else score += whiteCount * 2;
+		if (this.playerAI == 0) {
+			score += Eval_Black(state, kingCoords);
+			//score += blackCount;
+			int difference = blackCount - (whiteCount * 2);
+			score += difference;
+			if(blackCount < 4) {
+				score -= 25;
+			}
+		}
+		else {
+			score += Eval_White(state, kingCoords);
+			//score += whiteCount * 2;
+			int difference = (whiteCount * 2) - blackCount;
+			score += difference;
+			if(blackCount < 4) {
+				score += 25;
+			}
+		}
 		
 		return score;
 	}
-
-	public int[] King_Coords(char[][] state) {
-		// Find the king
-		int ky = -1, kx = -1;
-		for(int y = 0; y < state.length; y++) {
-			if(ky != -1) break;
-			for(int x = 0; x < state.length; x++) {
-				// check if king
-				if(state[y][x] == 'k') {
-					ky = y; kx = x;
-					break;
-				}
-			}
-		}
-		int[] out = {ky, kx};
-		return out;
-	}
 	
-	public boolean King_Captured(char[][] state) {
+	/*public boolean King_Captured(char[][] state, int[] kingCoords) {
 		
 		// Find the king
 		int ky,kx;
-		int[] kingCoords = King_Coords(state);
 		ky = kingCoords[0]; kx = kingCoords[1];
 		
 		// Lose state check
@@ -169,33 +181,25 @@ public class GameAI {
 		}
 		
 		return lost;
-	}
+	}*/
 	
-	public double Eval_White(char[][] state) {
-		/* Overview:
-		 * 
-		 * Win state = 100
-		 * lose state = -100
-		 * # of spaces away the center = 1 each
-		 */
+	public double Eval_White(char[][] state, int[] kingCoords) {
 		
-		double value = 0;
-		// Win state check
-		if(state[0][0] == 'k' || state[0][state.length-1] == 'k' || state[state.length-1][0] == 'k' || state[state.length-1][state.length-1] == 'k') {
-			value = 100;
-		} 
-		// Lost state check
-		else if(King_Captured(state)) {
-			value = -100;
+		double score = 0;
+		
+		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
+			score += 25;
 		}
 		
-		//number of spaces away from center calculation
-		//TODO - needs testing
-		int[] kingCoords = King_Coords(state);
-		int spacesFromCenter = Math.abs(kingCoords[0] - 5) + Math.abs(kingCoords[1] - 5);
-		value += spacesFromCenter;
+		int y = kingCoords[0];
+		int x = kingCoords[1];
+		if ((y != 10 && y != 0) && (x != 10 && x != 0)) {
+			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
+				score -= 25;
+			}
+		}
 		
-		return value;
+		return score;
 	}
 	
 	public char[][] Result(char[][] state, int[] action) {
@@ -293,6 +297,59 @@ public class GameAI {
 		return newState;
 	}
 	
+	public double Forward_Search(char[][] state, int[] kingCoords) {
+		
+		ArrayList<int[]> output = new ArrayList<int[]>();
+		
+		int x = kingCoords[1];
+		int y = kingCoords[0];
+		int ymax = state.length;
+		if((x == 0 || x == state.length-1)) ymax--;
+		for(int cy = y + 1; cy < ymax; cy++) {
+			if(state[cy][x] == 'e') {
+					output.add(new int[] {y,x,cy,x});
+			} else {
+				break;
+			}
+		}
+		// Up
+		int ymin = 0;
+		if((x == 0 || x == state.length-1)) ymin++;
+		for(int cy = y - 1; cy >= ymin; cy--) {
+			if(state[cy][x] == 'e') {
+					output.add(new int[] {y,x,cy,x});
+			} 
+			else {
+				break;
+			}
+		}
+		// Right
+		int xmax = state.length;
+		if((y == 0 || y == state.length-1)) xmax--;
+		for(int cx = x + 1; cx < xmax; cx++) {
+			if(state[y][cx] == 'e') {
+					output.add(new int[] {y,x,y,cx});
+			}
+			 else {
+				break;
+			}
+		}
+		// Left
+		int xmin = 0;
+		if((y == 0 || y == state.length-1)) xmin++;
+		for(int cx = x - 1; cx >= xmin; cx--) {
+			if(state[y][cx] == 'e') {
+				
+					output.add(new int[] {y,x,y,cx});
+			}
+			else {
+				break;
+			}
+		}
+		
+		return 2.0;
+	}
+	
 	public int[][] Actions(char[][] state, int player) {
 		
 		/*
@@ -325,9 +382,8 @@ public class GameAI {
 					if((x == 0 || x == state.length-1) && !kingPiece) ymax--;
 					for(int cy = y + 1; cy < ymax; cy++) {
 						if(state[cy][x] == 'e') {
-							if(cy == 5 && x == 5) {
-								if(kingPiece) output.add(new int[] {y,x,cy,x});
-								else break;
+							if(cy == 5 && x == 5 && state[y][x] != 'k') {
+								break;
 							} else {
 								output.add(new int[] {y,x,cy,x});
 							}
@@ -340,9 +396,8 @@ public class GameAI {
 					if((x == 0 || x == state.length-1) && !kingPiece) ymin++;
 					for(int cy = y - 1; cy >= ymin; cy--) {
 						if(state[cy][x] == 'e') {
-							if(cy == 5 && x == 5) {
-								if(kingPiece) output.add(new int[] {y,x,cy,x});
-								else break;
+							if(cy == 5 && x == 5 && state[y][x] != 'k') {
+								break;
 							} else {
 								output.add(new int[] {y,x,cy,x});
 							}
@@ -355,9 +410,8 @@ public class GameAI {
 					if((y == 0 || y == state.length-1) && !kingPiece) xmax--;
 					for(int cx = x + 1; cx < xmax; cx++) {
 						if(state[y][cx] == 'e') {
-							if(y == 5 && cx == 5) {
-								if(kingPiece) output.add(new int[] {y,x,y,cx});
-								else break;
+							if(y == 5 && cx == 5 && state[y][x] != 'k') {
+								break;
 							} else {
 								output.add(new int[] {y,x,y,cx});
 							}
@@ -370,9 +424,8 @@ public class GameAI {
 					if((y == 0 || y == state.length-1) && !kingPiece) xmin++;
 					for(int cx = x - 1; cx >= xmin; cx--) {
 						if(state[y][cx] == 'e') {
-							if(y == 5 && cx == 5) {
-								if(kingPiece) output.add(new int[] {y,x,y,cx});
-								else break;
+							if(y == 5 && cx == 5 && state[y][x] != 'k') {
+								break;
 							} else {
 								output.add(new int[] {y,x,y,cx});
 							}
