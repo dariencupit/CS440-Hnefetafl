@@ -12,7 +12,7 @@ public class GameAI {
 	//		represent action in the form of y,x
 	// State
 	//		- State is represented as a double char array of characters
-	final int limit = 3;
+	final int limit = 4;
 	int playerAI = 0;
 	
 	public int[] Minimax_Decision(char[][] state, int player) { // Implements Alpha-Beta Pruning
@@ -37,7 +37,12 @@ public class GameAI {
 	//  Russell, Stuart J.; Norvig, Peter (2003), Artificial Intelligence: A Modern Approach (2nd ed.), Upper Saddle River, New Jersey: Prentice Hall, ISBN 0-13-790395-2
 	public double Alpha_Beta(char[][] state, int player, int depth, double a, double b) {
 		
-		if (depth == this.limit) return Eval(state, player);
+		if (depth == this.limit) return Eval(state);
+		
+		if (Win_State(state)) {
+			if (player == this.playerAI) return -100;
+			else return 100;
+		}
 		
 		if (player == this.playerAI) {
 			double value = Double.NEGATIVE_INFINITY;
@@ -62,6 +67,14 @@ public class GameAI {
 		}
 	}
 	
+	public boolean Win_State(char[][] state) {
+		double value = Eval(state);
+		if (value > 50 || value < -50)  {
+			System.out.println("Win State Score: " + value);
+			return true;
+		}
+		else return false;
+	}
 	/*public double Max_Value(char[][] state, int player, int depth) {
 
 		if (depth == this.limit) return Eval(state, player);
@@ -107,21 +120,21 @@ public class GameAI {
 		double score = 0.0;
 		
 		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
-			score -= 50;
+			score -= 100;
 		}
 		
 		int y = kingCoords[0];
 		int x = kingCoords[1];
 		if((y != 10 && y != 0) && (x != 10 && x != 0)) {
 			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
-				score += 50;
+				score += 100;
 			}
 		}
 		
 		return score;
 	}
 	
-	public double Eval(char[][] state, int player) {
+	public double Eval(char[][] state) {
 		
 		double score = 0.0;
 		
@@ -146,7 +159,7 @@ public class GameAI {
 			int difference = blackCount - (whiteCount * 2);
 			score += difference;
 			if(blackCount < 4) {
-				score -= 50;
+				score -= 100;
 			}
 		}
 		else {
@@ -155,7 +168,7 @@ public class GameAI {
 			int difference = (whiteCount * 2) - blackCount;
 			score += difference;
 			if(blackCount < 4) {
-				score += 50;
+				score += 100;
 			}
 		}
 		return score;
@@ -193,14 +206,14 @@ public class GameAI {
 		double score = 0;
 		
 		if(state[0][0] == 'k' || state[0][10] == 'k' || state[10][10] == 'k'||state[10][0] == 'k') {
-			score += 50;
+			score += 100;
 		}
 		
 		int y = kingCoords[0];
 		int x = kingCoords[1];
 		if ((y != 10 && y != 0) && (x != 10 && x != 0)) {
 			if(state[y+1][x] == 'b' && state[y-1][x] == 'b' && state[y][x+1] == 'b' && state[y][x-1] == 'b') {
-				score -= 50;
+				score -= 100;
 			}
 		}
 		
@@ -221,7 +234,7 @@ public class GameAI {
 			char oneUp = newState[action[2] - 1][action[3]];
 			char current = newState[action[2]][action[3]];
 			
-			if (((oneUp != current && current != 'k') || (current == 'k' && oneUp == 'e')) && (oneUp != 'e') && (oneUp != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneUp != current && current != 'k') || (current == 'k' && oneUp == 'b')) && (oneUp != 'e') && (oneUp != 'k')) { // checks if there is an enemy piece next action moved piece
 				
 				if (current == twoUp || (current == 'w' && twoUp == 'k') || (current == 'k' && twoUp == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2] - 1][action[3]] = 'e';
@@ -242,7 +255,7 @@ public class GameAI {
 			char oneRight = newState[action[2]][action[3] + 1];
 			char current = newState[action[2]][action[3]];
 			
-			if (((oneRight != current && current != 'k') || (current == 'k' && oneRight == 'e')) && (oneRight != 'e') && (oneRight != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneRight != current && current != 'k') || (current == 'k' && oneRight == 'b')) && (oneRight != 'e') && (oneRight != 'k')) { // checks if there is an enemy piece next action moved piece
 				
 				if (current == twoRight || (current == 'w' && twoRight == 'k') || (current == 'k' && twoRight == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2]][action[3] + 1] = 'e';
@@ -263,7 +276,7 @@ public class GameAI {
 			char oneDown = newState[action[2] + 1][action[3]];
 			char current = newState[action[2]][action[3]];
 			
-			if (((oneDown != current && current != 'k') || (current == 'k' && oneDown == 'e')) && (oneDown != 'e') && (oneDown != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneDown != current && current != 'k') || (current == 'k' && oneDown == 'b')) && (oneDown != 'e') && (oneDown != 'k')) { // checks if there is an enemy piece next action moved piece
 				
 				if (current == twoDown || (current == 'w' && twoDown == 'k') || (current == 'k' && twoDown == 'w')) { // checks if enemy piece is capturable  and it isnt a king
 					newState[action[2] + 1][action[3]] = 'e';
@@ -284,7 +297,7 @@ public class GameAI {
 			char oneLeft = newState[action[2]][action[3] - 1];
 			char current = newState[action[2]][action[3]];
 			
-			if (((oneLeft != current && current != 'k') || (current == 'k' && oneLeft == 'e')) && (oneLeft != 'e') && (oneLeft != 'k')) { // checks if there is an enemy piece next action moved piece
+			if (((oneLeft != current && current != 'k') || (current == 'k' && oneLeft == 'b')) && (oneLeft != 'e') && (oneLeft != 'k')) { // checks if there is an enemy piece next action moved piece
 				
 				if (current == twoLeft || (current == 'w' && twoLeft == 'k') || (current == 'k' && twoLeft == 'w')) { // checks if enemy piece is capturable and it isnt a king
 					newState[action[2]][action[3] - 1] = 'e';
