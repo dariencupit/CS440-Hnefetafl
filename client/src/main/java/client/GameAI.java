@@ -115,6 +115,26 @@ public class GameAI {
 		return new_player;
 	}
 	
+	public double Eval_King_Blocked(char[][] state, int[] kingCoords) {
+		double out = 0;
+		int y = kingCoords[0];
+		int x = kingCoords[1];
+		
+		if(y != 10) {
+			if(state[y+1][x] == 'b') out++;
+		} 
+		if(y != 0) {
+			if(state[y-1][x] == 'b') out++;
+		}
+		if(x != 10) {
+			if(state[y][x+1] == 'b') out++;
+		} 
+		if(x != 0) {
+			if(state[y][x-1] == 'b') out++;
+		}
+		return out;
+	}
+	
 	public double Eval_Black(char[][] state, int[] kingCoords) {
 		
 		double score = 0.0;
@@ -152,8 +172,10 @@ public class GameAI {
 				}
 			}
 		}
-		
+
+
 		if (this.playerAI == 0) {
+			score += Eval_King_Blocked(state, kingCoords);
 			score += Eval_Black(state, kingCoords);
 			//score += blackCount;
 			int difference = blackCount - (whiteCount * 2);
