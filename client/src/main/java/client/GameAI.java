@@ -49,8 +49,8 @@ public class GameAI {
 			int[][] actions = Actions(state, player);
 			for (int[] action : actions) {
 				value = Double.max(value, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				if (value >= b) break;
 				a = Double.max(a, value);
-				if (b <= a) break;
 			}
 			return value;
 		}
@@ -60,8 +60,8 @@ public class GameAI {
 			int[][] actions = Actions(state, player);
 			for (int[] action : actions) {
 				value = Double.min(value, Alpha_Beta(Result(state, action), Switch_Player(player), depth + 1, a, b));
+				if (value <= a) break;
 				b = Double.min(b, value);
-				if (b <= a) break;
 			}
 			return value;
 		}
